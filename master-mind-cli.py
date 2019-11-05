@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
-"""
-数あてゲーム
+"""数あてゲーム.
 
 - 「答え」として3桁の数字をランダムで決定
 - 各桁の数字は全部違う数字である
@@ -23,47 +22,38 @@ import random
 
 
 class GameSetting:
-    """ゲーム設定
-    """
+    """ゲーム設定."""
+
     playColumns = 3
     isDebug = True
 
 
 class NumberBox:
-    """抽選箱とロジック
-    """
+    """抽選箱とロジック."""
+
     __lotteryNumberBox = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     __selectedNumbers = []
     __answerCount = 0
 
     def __init__(self):
-        """Constractor
-        """
+        """Constractor."""
         # loop in play columns.
         for i in range(GameSetting.playColumns):
             self.__drawLots()
         print(self.__selectedNumbers)
 
     def __drawLots(self):
-        """Draw Lots
-        """
+        """Draw Lots."""
         lotteryIndex = random.randrange(len(self.__lotteryNumberBox))
         lotteryNumber = self.__lotteryNumberBox.pop(lotteryIndex)
         self.__selectedNumbers.append(lotteryNumber)
 
     def getSelectedNumber(self, columns):
-        """Get Selected Number
-        Paramater
-        ----
-        columns:int
-
-        Return
-        ----
-        number:int
-        """
+        """Get Selected Number."""
         return(self.__selectedNumbers[columns])
 
     def answerNumbers(self, answerNumbers):
+        """Answer logics."""
         self.__answerCount += 1
         eat = 0
         bite = 0
@@ -88,7 +78,7 @@ class NumberBox:
             return True
 
 
-"""Main Logic"""
+"""Main Logic."""
 try:
     numberBox = NumberBox()
     loopFlag = True
