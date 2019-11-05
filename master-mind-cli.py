@@ -21,24 +21,30 @@ __date__ = '2019/11/01'
 import random
 
 
-class GameSetting:
+class Common:
     """ゲーム設定."""
 
     playColumns = 3
     isDebug = True
 
+    def debug(self, obj):
+        """Debug Print."""
+        if self.isDebug is True:
+            print(obj)
+
 
 class NumberBox:
     """抽選箱とロジック."""
 
+    __playColumns = 3
     __lotteryNumberBox = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     __selectedNumbers = []
-    __answerCount = 0
 
-    def __init__(self):
+    def __init__(self, playColumns=3):
         """Constractor."""
+        self.__playColumns = playColumns
         # loop in play columns.
-        for i in range(GameSetting.playColumns):
+        for i in range(self.__playColumns):
             self.__drawLots()
         print(self.__selectedNumbers)
 
@@ -52,16 +58,39 @@ class NumberBox:
         """Get Selected Number."""
         return(self.__selectedNumbers[columns])
 
+    def getPlayColumns(self):
+        """Get Play Columns."""
+        return(self.__playColumns)
+
+    def getSelectedNumbers(self):
+        """Get Selected Numbers."""
+        return(self.__selectedNumbers)
+
+
+class MindLogic:
+    """Mind Logic."""
+
+    __numberBox = None
+    __answerCount = 0
+
+    def __init__(self, numberBox=None):
+        """Constractor."""
+        if numberBox is None:
+            numberBox = NumberBox()
+        self.__numberBox = numberBox
+
     def answerNumbers(self, answerNumbers):
         """Answer logics."""
         self.__answerCount += 1
+        playColumns = self.__numberBox.getPlayColumns()
         eat = 0
         bite = 0
         error = 0
-        for i in range(GameSetting.playColumns):
+        for i in range(playColumns):
             answerNumber = int(answerNumbers[i])
-            if answerNumber in self.__selectedNumbers:
-                if self.__selectedNumbers.index(answerNumber) == i:
+            selectedNumbers = self.__numberBox.getSelectedNumbers()
+            if answerNumber in selectedNumbers:
+                if selectedNumbers.index(answerNumber) == i:
                     eat += 1
                 else:
                     bite += 1
@@ -71,7 +100,7 @@ class NumberBox:
         print("[" + str(self.__answerCount) + "] Eat:" + str(eat) +
               " Bite:" + str(bite) + " Error:" + str(error))
 
-        if eat == GameSetting.playColumns:
+        if eat == playColumns:
             print("Comp!")
             return False
         else:
@@ -80,10 +109,11 @@ class NumberBox:
 
 """Main Logic."""
 try:
-    numberBox = NumberBox()
+    numberBox = NumberBox(Common.playColumns)
+    mindLogic = MindLogic(numberBox)
     loopFlag = True
     while loopFlag is True:
         inputAnswer = input("answer?:")
-        loopFlag = numberBox.answerNumbers(inputAnswer)
+        loopFlag = mindLogic.answerNumbers(inputAnswer)
 except Exception as e:
     print(e)
