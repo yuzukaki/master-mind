@@ -14,11 +14,13 @@
     - 答え: 456 入力: 463  → 1EAT 1BITE
     - 答え: 456 入力: 671  → 0EAT 1BITE
 """
-__author__  = 'uekiy'
+__author__ = 'uekiy'
 __version__ = '0.01'
-__date__    = '2019/11/01'
+__date__ = '2019/11/01'
+
 
 import random
+
 
 class GameSetting:
     """ゲーム設定
@@ -26,10 +28,11 @@ class GameSetting:
     playColumns = 3
     isDebug = True
 
+
 class NumberBox:
     """抽選箱とロジック
     """
-    __lotteryNumberBox  = [0,1,2,3,4,5,6,7,8,9]
+    __lotteryNumberBox = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     __selectedNumbers = []
     __answerCount = 0
 
@@ -44,7 +47,7 @@ class NumberBox:
     def __drawLots(self):
         """Draw Lots
         """
-        lotteryIndex  = random.randrange(len(self.__lotteryNumberBox))
+        lotteryIndex = random.randrange(len(self.__lotteryNumberBox))
         lotteryNumber = self.__lotteryNumberBox.pop(lotteryIndex)
         self.__selectedNumbers.append(lotteryNumber)
 
@@ -52,8 +55,11 @@ class NumberBox:
         """Get Selected Number
         Paramater
         ----
-        columns 
+        columns:int
 
+        Return
+        ----
+        number:int
         """
         return(self.__selectedNumbers[columns])
 
@@ -72,7 +78,8 @@ class NumberBox:
             else:
                 error += 1
 
-        print("[" + str(self.__answerCount) + "] Eat:" + str(eat) + " Bite:" + str(bite) + " Error:" + str(error))
+        print("[" + str(self.__answerCount) + "] Eat:" + str(eat) +
+              " Bite:" + str(bite) + " Error:" + str(error))
 
         if eat == GameSetting.playColumns:
             print("Comp!")
@@ -80,12 +87,13 @@ class NumberBox:
         else:
             return True
 
+
 """Main Logic"""
 try:
     numberBox = NumberBox()
     loopFlag = True
-    while loopFlag == True:
+    while loopFlag is True:
         inputAnswer = input("answer?:")
         loopFlag = numberBox.answerNumbers(inputAnswer)
 except Exception as e:
-        print(e)
+    print(e)
