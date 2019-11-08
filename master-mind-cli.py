@@ -19,101 +19,118 @@ __date__ = '2019/11/01'
 
 
 import random
+import json
 
 
 class Common:
     """ゲーム設定."""
 
-    playColumns = 3
-    isDebug = True
+    play_columns = 3
+    is_debug = True
 
     def debug(self, obj):
         """Debug Print."""
-        if self.isDebug is True:
+        if self.is_debug is True:
             print(obj)
 
 
-class NumberBox:
-    """抽選箱とロジック."""
+class LotteryBox:
+    """抽選箱クラス."""
 
-    __playColumns = 3
-    __lotteryNumberBox = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    __selectedNumbers = []
+    __play_columns = 3
+    __lottery_numbers = []
+    __selected_numbers = []
 
-    def __init__(self, playColumns=3):
+    def __init__(self,
+                 play_columns=3,
+                 numbers=['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']):
         """Constractor."""
-        self.__playColumns = playColumns
+        self.init_box(play_columns, numbers)
+
+    def init_box(self,
+                 play_columns=3,
+                 numbers=['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']):
+        """Initialize Box."""
+        self.__play_columns = play_columns
+        self.__lottery_numbers = numbers
+        self.__selected_numbers = []
         # loop in play columns.
-        for i in range(self.__playColumns):
-            self.__drawLots()
-        print(self.__selectedNumbers)
+        for i in range(self.__play_columns):
+            self.__draw_lots()
+        print(self.__selected_numbers)
 
-    def __drawLots(self):
+    def __draw_lots(self):
         """Draw Lots."""
-        lotteryIndex = random.randrange(len(self.__lotteryNumberBox))
-        lotteryNumber = self.__lotteryNumberBox.pop(lotteryIndex)
-        self.__selectedNumbers.append(lotteryNumber)
+        lottery_index = random.randrange(len(self.__lottery_numbers))
+        lottery_number = self.__lottery_numbers.pop(lottery_index)
+        self.__selected_numbers.append(lottery_number)
 
-    def getSelectedNumber(self, columns):
+    def get_selected_number(self, columns):
         """Get Selected Number."""
-        return(self.__selectedNumbers[columns])
+        return(self.__selected_numbers[columns])
 
-    def getPlayColumns(self):
+    def get_play_columns(self):
         """Get Play Columns."""
-        return(self.__playColumns)
+        return(self.__play_columns)
 
-    def getSelectedNumbers(self):
+    def get_selected_numbers(self):
         """Get Selected Numbers."""
-        return(self.__selectedNumbers)
+        return(self.__selected_numbers)
 
 
 class MindLogic:
     """Mind Logic."""
 
-    __numberBox = None
-    __answerCount = 0
+    __lottery_box = None
+    __answer_count = 0
 
-    def __init__(self, numberBox=None):
+    def __init__(self, lottery_box=None):
         """Constractor."""
-        if numberBox is None:
-            numberBox = NumberBox()
-        self.__numberBox = numberBox
+        if lottery_box is None:
+            lottery_box = LotteryBox()
+        self.__lottery_box = lottery_box
 
-    def answerNumbers(self, answerNumbers):
+    def answer_numbers(self, answer_numbers):
         """Answer logics."""
-        self.__answerCount += 1
-        playColumns = self.__numberBox.getPlayColumns()
+        self.__answer_count += 1
+        play_columns = self.__lottery_box.get_play_columns()
         eat = 0
         bite = 0
         error = 0
-        for i in range(playColumns):
-            answerNumber = int(answerNumbers[i])
-            selectedNumbers = self.__numberBox.getSelectedNumbers()
-            if answerNumber in selectedNumbers:
-                if selectedNumbers.index(answerNumber) == i:
+
+        for i in range(play_columns):
+            answer_number = answer_numbers[i]
+            selected_numbers = self.__lottery_box.get_selected_numbers()
+            if answer_number in selected_numbers:
+                if selected_numbers.index(answer_number) == i:
                     eat += 1
                 else:
                     bite += 1
             else:
                 error += 1
 
-        print("[" + str(self.__answerCount) + "] Eat:" + str(eat) +
-              " Bite:" + str(bite) + " Error:" + str(error))
+        status = True
+        if eat == play_columns:
+            status = False
 
-        if eat == playColumns:
-            print("Comp!")
-            return False
-        else:
-            return True
-
+        return json.dumps({
+            'count': self.__answer_count,
+            'columns': play_columns,
+            'eat': eat,
+            'bite': bite,
+            'error': error,
+            'status': status,
+        })
 
 """Main Logic."""
 try:
-    numberBox = NumberBox(Common.playColumns)
-    mindLogic = MindLogic(numberBox)
-    loopFlag = True
-    while loopFlag is True:
-        inputAnswer = input("answer?:")
-        loopFlag = mindLogic.answerNumbers(inputAnswer)
+    lottery_box = LotteryBox(Common.play_columns)
+    mind_logic = MindLogic(lottery_box)
+    loop_flag = True
+    while loop_flag is True:
+        input_answer = input("answer?:")
+        return_hash = json.loads(mind_logic.answer_numbers(input_answer))
+        print(return_hash)
+        loop_flag = return_hash['status']
 except Exception as e:
     print(e)
